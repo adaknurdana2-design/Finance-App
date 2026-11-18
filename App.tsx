@@ -10,6 +10,7 @@ import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import SecurityPinScreen from './src/screens/SecurityPinScreen';
 import NewPasswordScreen from './src/screens/NewPasswordScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import NotificationScreen from './src/screens/NotificationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,10 @@ export default function App() {
         <Stack.Screen name="SecurityPin" component={SecurityPinScreen} />
         <Stack.Screen name="NewPassword" component={NewPasswordScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Notification" component={NotificationScreen} />
+        
+        {/* Анализ беті әзірге HomeScreen-ге бағытталған */}
+        <Stack.Screen name="Analysis" component={HomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

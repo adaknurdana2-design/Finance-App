@@ -1,4 +1,3 @@
-// src/screens/HomeScreen.tsx
 import React from 'react';
 import {
   StyleSheet,
@@ -13,13 +12,16 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Жоғарғы бөлік (Приветствие және хабарлама белгісі) */}
+        {/* Жоғарғы бөлік (Приветствие және хабарлама белгісі -> Notification бетіне апарады) */}
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.greetingTitle}>Hi, Welcome Back</Text>
             <Text style={styles.greetingSubtitle}>Good Morning</Text>
           </View>
-          <TouchableOpacity style={styles.notificationBtn}>
+          <TouchableOpacity 
+            style={styles.notificationBtn}
+            onPress={() => navigation.navigate('Notification')}
+          >
             <Text style={styles.notificationIcon}>🔔</Text>
           </TouchableOpacity>
         </View>
