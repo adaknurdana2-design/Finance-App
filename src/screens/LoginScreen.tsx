@@ -52,7 +52,11 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
           <Text style={styles.loginBtnText}>Log In</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.forgotBtn}>
+        {/* Құпиясөзді ұмыттым батырмасы (ForgotPassword бетіне апарады) */}
+        <TouchableOpacity 
+          style={styles.forgotBtn}
+          onPress={() => navigation.navigate('ForgotPassword')}
+        >
           <Text style={styles.forgotText}>Forgot Password?</Text>
         </TouchableOpacity>
 
@@ -92,7 +96,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#35C29B', // Figma-дағы ашық жасыл фон
+    backgroundColor: '#35C29B',
   },
   header: {
     height: 110,
@@ -136,7 +140,7 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 14,
     fontSize: 14,
     color: '#093030',
   },
