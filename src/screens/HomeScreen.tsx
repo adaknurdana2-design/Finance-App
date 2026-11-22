@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,70 @@ import {
   ScrollView,
 } from 'react-native';
 
+type FilterPeriod = 'Daily' | 'Weekly' | 'Monthly';
+
+interface TransactionItem {
+  id: string;
+  title: string;
+  date: string;
+  category: string;
+  amount: string;
+  isIncome: boolean;
+  icon: string;
+  period: FilterPeriod;
+}
+
+const TRANSACTIONS_DATA: TransactionItem[] = [
+  {
+    id: '1',
+    title: 'Salary',
+    date: '18:27 - April 30',
+    category: 'Monthly',
+    amount: '$4.000,00',
+    isIncome: true,
+    icon: '💼',
+    period: 'Monthly',
+  },
+  {
+    id: '2',
+    title: 'Groceries',
+    date: '17:00 - April 24',
+    category: 'Pantry',
+    amount: '-$100,00',
+    isIncome: false,
+    icon: '🛍️',
+    period: 'Weekly',
+  },
+  {
+    id: '3',
+    title: 'Rent',
+    date: '8:30 - April 15',
+    category: 'Rent',
+    amount: '-$674,40',
+    isIncome: false,
+    icon: '🔑',
+    period: 'Monthly',
+  },
+  {
+    id: '4',
+    title: 'Coffee',
+    date: '09:15 - Today',
+    category: 'Food',
+    amount: '-$4,50',
+    isIncome: false,
+    icon: '☕',
+    period: 'Daily',
+  },
+];
+
 export default function HomeScreen({ navigation }: { navigation: any }) {
+  const [selectedPeriod, setSelectedPeriod] = useState<FilterPeriod>('Monthly');
+
+  const filteredTransactions = TRANSACTIONS_DATA.filter((item) => {
+    if (selectedPeriod === 'Monthly') return true;
+    return item.period === selectedPeriod;
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -18,7 +81,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
             <Text style={styles.greetingTitle}>Hi, Welcome Back</Text>
             <Text style={styles.greetingSubtitle}>Good Morning</Text>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.notificationBtn}
             onPress={() => navigation.navigate('Notification')}
           >
@@ -26,8 +89,12 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
           </TouchableOpacity>
         </View>
 
-        {/* Қаржы карточкасы (Total Balance & Expense) */}
-        <View style={styles.balanceCard}>
+        {/* Қаржы карточкасы (Total Balance & Expense -> AccountBalance бетіне апарады) */}
+        <TouchableOpacity
+          style={styles.balanceCard}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('AccountBalance')}
+        >
           <View style={styles.balanceRow}>
             <View style={styles.balanceCol}>
               <Text style={styles.balanceLabel}>↗ Total Balance</Text>
@@ -49,12 +116,16 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
           </View>
 
           <Text style={styles.tipText}>☑ 30% Of Your Expenses, Looks Good.</Text>
-        </View>
+        </TouchableOpacity>
 
         {/* Ақ түсті негізгі бөлік */}
         <View style={styles.mainContent}>
-          {/* Savings & Revenue карточкасы */}
-          <View style={styles.statsCard}>
+          {/* Savings & Revenue карточкасы -> Analysis бетіне апарады */}
+          <TouchableOpacity
+            style={styles.statsCard}
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate('Analysis')}
+          >
             <View style={styles.savingsBox}>
               <View style={styles.circleProgress}>
                 <Text style={styles.carEmoji}>🚗</Text>
@@ -80,89 +151,50 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                 </View>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
 
           {/* Күндік / Апталық / Айлық таңдау */}
           <View style={styles.filterRow}>
-            <TouchableOpacity style={styles.filterTab}>
-              <Text style={styles.filterText}>Daily</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.filterTab}>
-              <Text style={styles.filterText}>Weekly</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.filterTab, styles.filterTabActive]}>
-              <Text style={[styles.filterText, styles.filterTextActive]}>Monthly</Text>
-            </TouchableOpacity>
+            {(['Daily', 'Weekly', 'Monthly'] as FilterPeriod[]).map((period) => {
+              const isActive = selectedPeriod === period;
+              return (
+                <TouchableOpacity
+                  key={period}
+                  style={[styles.filterTab, isActive && styles.filterTabActive]}
+                  onPress={() => setSelectedPeriod(period)}
+                >
+                  <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
+                    {period}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           {/* Транзакциялар тізімі */}
           <Text style={styles.sectionTitle}>Transactions</Text>
 
-          {/* 1-ші транзакция: Salary */}
-          <View style={styles.transactionItem}>
-            <View style={styles.transIconBlue}>
-              <Text style={styles.transEmoji}>💼</Text>
+          {filteredTransactions.map((item) => (
+            <View key={item.id} style={styles.transactionItem}>
+              <View style={styles.transIconBlue}>
+                <Text style={styles.transEmoji}>{item.icon}</Text>
+              </View>
+              <View style={styles.transDetails}>
+                <Text style={styles.transTitle}>{item.title}</Text>
+                <Text style={styles.transDate}>{item.date}</Text>
+              </View>
+              <View style={styles.transRight}>
+                <Text style={styles.transCategory}>{item.category}</Text>
+                <Text
+                  style={item.isIncome ? styles.transAmountGreen : styles.transAmountRed}
+                >
+                  {item.amount}
+                </Text>
+              </View>
             </View>
-            <View style={styles.transDetails}>
-              <Text style={styles.transTitle}>Salary</Text>
-              <Text style={styles.transDate}>18:27 - April 30</Text>
-            </View>
-            <View style={styles.transRight}>
-              <Text style={styles.transCategory}>Monthly</Text>
-              <Text style={styles.transAmountGreen}>$4.000,00</Text>
-            </View>
-          </View>
-
-          {/* 2-ші транзакция: Groceries */}
-          <View style={styles.transactionItem}>
-            <View style={styles.transIconBlue}>
-              <Text style={styles.transEmoji}>🛍️</Text>
-            </View>
-            <View style={styles.transDetails}>
-              <Text style={styles.transTitle}>Groceries</Text>
-              <Text style={styles.transDate}>17:00 - April 24</Text>
-            </View>
-            <View style={styles.transRight}>
-              <Text style={styles.transCategory}>Pantry</Text>
-              <Text style={styles.transAmountRed}>-$100,00</Text>
-            </View>
-          </View>
-
-          {/* 3-ші транзакция: Rent */}
-          <View style={styles.transactionItem}>
-            <View style={styles.transIconBlue}>
-              <Text style={styles.transEmoji}>🔑</Text>
-            </View>
-            <View style={styles.transDetails}>
-              <Text style={styles.transTitle}>Rent</Text>
-              <Text style={styles.transDate}>8:30 - April 15</Text>
-            </View>
-            <View style={styles.transRight}>
-              <Text style={styles.transCategory}>Rent</Text>
-              <Text style={styles.transAmountRed}>-$674,40</Text>
-            </View>
-          </View>
+          ))}
         </View>
       </ScrollView>
-
-      {/* Төменгі Навигация Панелі (Bottom Navigation) */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItemActive}>
-          <Text style={styles.navIcon}>🏠</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Analysis')}>
-          <Text style={styles.navIcon}>📊</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navIcon}>🔄</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navIcon}>📚</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.navIcon}>👤</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }
@@ -274,7 +306,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 35,
     paddingHorizontal: 20,
     paddingTop: 25,
-    paddingBottom: 90,
+    paddingBottom: 24,
   },
   statsCard: {
     flexDirection: 'row',
@@ -418,35 +450,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: 'bold',
     color: '#E53935',
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 70,
-    backgroundColor: '#F3FFF6',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#E4F6EA',
-    paddingHorizontal: 10,
-  },
-  navItemActive: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    backgroundColor: '#35C29B',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  navItem: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-  },
-  navIcon: {
-    fontSize: 20,
   },
 });

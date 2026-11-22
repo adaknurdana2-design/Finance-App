@@ -9,8 +9,10 @@ import SignUpScreen from './src/screens/SignUpScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import SecurityPinScreen from './src/screens/SecurityPinScreen';
 import NewPasswordScreen from './src/screens/NewPasswordScreen';
-import HomeScreen from './src/screens/HomeScreen';
 import NotificationScreen from './src/screens/NotificationScreen';
+import AccountBalanceScreen from './src/screens/AccountBalanceScreen';
+import QuicklyAnalysisScreen from './src/screens/QuicklyAnalysisScreen';
+import MainTabs from './src/navigation/MainTabs';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,11 +30,14 @@ export default function App() {
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="SecurityPin" component={SecurityPinScreen} />
         <Stack.Screen name="NewPassword" component={NewPasswordScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Notification" component={NotificationScreen} />
         
-        {/* Анализ беті әзірге HomeScreen-ге бағытталған */}
-        <Stack.Screen name="Analysis" component={HomeScreen} />
+        {/* Негізгі бет (төменгі мәзірмен бірге) */}
+        <Stack.Screen name="Home" component={MainTabs} />
+        
+        {/* Анализ және Баланс беттері */}
+        <Stack.Screen name="Analysis" component={QuicklyAnalysisScreen} />
+        <Stack.Screen name="AccountBalance" component={AccountBalanceScreen} />
+        <Stack.Screen name="Notification" component={NotificationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
