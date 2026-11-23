@@ -24,12 +24,16 @@ const CHART_DATA: Record<
   {
     incomeTotal: string;
     expenseTotal: string;
+    yLabels: [string, string, string, string];
+    maxChartValue: number;
     bars: ChartBarItem[];
   }
 > = {
   Daily: {
     incomeTotal: '$4,120.00',
     expenseTotal: '$1.187.40',
+    yLabels: ['15k', '10k', '5k', '1k'],
+    maxChartValue: 15,
     bars: [
       { label: 'Mon', income: 4.5, expense: 8.2 },
       { label: 'Tue', income: 1.5, expense: 3.8 },
@@ -43,6 +47,8 @@ const CHART_DATA: Record<
   Weekly: {
     incomeTotal: '$11,420.00',
     expenseTotal: '$20,000.20',
+    yLabels: ['15k', '10k', '5k', '1k'],
+    maxChartValue: 15,
     bars: [
       { label: '1st Week', income: 3.5, expense: 10.2 },
       { label: '2nd Week', income: 1.5, expense: 4.2 },
@@ -53,6 +59,8 @@ const CHART_DATA: Record<
   Monthly: {
     incomeTotal: '$47,200.00',
     expenseTotal: '$35,510.20',
+    yLabels: ['15k', '10k', '5k', '1k'],
+    maxChartValue: 15,
     bars: [
       { label: 'Jan', income: 2.5, expense: 8.0 },
       { label: 'Feb', income: 1.8, expense: 6.2 },
@@ -63,14 +71,16 @@ const CHART_DATA: Record<
     ],
   },
   Year: {
-    incomeTotal: '$195,400.00',
-    expenseTotal: '$58,620.00',
+    incomeTotal: '$430,560.00',
+    expenseTotal: '$320,300.00',
+    yLabels: ['100k', '80k', '60k', '50k'],
+    maxChartValue: 100,
     bars: [
-      { label: '2022', income: 9.5, expense: 4.5 },
-      { label: '2023', income: 11.2, expense: 5.8 },
-      { label: '2024', income: 12.8, expense: 6.1 },
-      { label: '2025', income: 14.0, expense: 6.9 },
-      { label: '2026', income: 14.8, expense: 5.4 },
+      { label: '2019', income: 24, expense: 82 },
+      { label: '2020', income: 22, expense: 74 },
+      { label: '2021', income: 32, expense: 96 },
+      { label: '2022', income: 18, expense: 60 },
+      { label: '2023', income: 28, expense: 92 },
     ],
   },
 };
@@ -86,7 +96,7 @@ export interface AnalysisScreenProps {
 export default function AnalysisScreen({
   navigation,
   route,
-  initialPeriod = 'Monthly',
+  initialPeriod = 'Year',
   onNavigateTab,
   onBack,
 }: AnalysisScreenProps) {
@@ -103,7 +113,6 @@ export default function AnalysisScreen({
   }, [route?.params?.initialPeriod, initialPeriod]);
 
   const currentData = CHART_DATA[selectedPeriod];
-  const maxChartValue = 15;
   const maxBarHeight = 96;
 
   const handleGoBack = () => {
@@ -201,10 +210,10 @@ export default function AnalysisScreen({
             </View>
             <View style={styles.chartBody}>
               <View style={styles.yAxis}>
-                <Text style={styles.yLabel}>15k</Text>
-                <Text style={styles.yLabel}>10k</Text>
-                <Text style={styles.yLabel}>5k</Text>
-                <Text style={styles.yLabel}>1k</Text>
+                <Text style={styles.yLabel}>{currentData.yLabels[0]}</Text>
+                <Text style={styles.yLabel}>{currentData.yLabels[1]}</Text>
+                <Text style={styles.yLabel}>{currentData.yLabels[2]}</Text>
+                <Text style={styles.yLabel}>{currentData.yLabels[3]}</Text>
               </View>
               <View style={styles.barsArea}>
                 <View style={[styles.gridLine, { top: 6 }]} />
@@ -213,8 +222,14 @@ export default function AnalysisScreen({
                 <View style={[styles.gridLine, { top: 96 }]} />
                 <View style={styles.barsRow}>
                   {currentData.bars.map((item, idx) => {
-                    const incomeH = Math.max(6, (item.income / maxChartValue) * maxBarHeight);
-                    const expenseH = Math.max(6, (item.expense / maxChartValue) * maxBarHeight);
+                    const incomeH = Math.max(
+                      6,
+                      (item.income / currentData.maxChartValue) * maxBarHeight
+                    );
+                    const expenseH = Math.max(
+                      6,
+                      (item.expense / currentData.maxChartValue) * maxBarHeight
+                    );
                     return (
                       <View key={idx} style={styles.barGroup}>
                         <View style={styles.barPair}>

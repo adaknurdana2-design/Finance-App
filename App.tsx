@@ -4,7 +4,7 @@ import AnalysisScreen, { AppTabKey, PeriodKey } from './src/screens/AnalysisScre
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<AppTabKey>('Analysis');
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodKey>('Monthly');
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodKey>('Year');
 
   const openAnalysisWithPeriod = (period: PeriodKey) => {
     setSelectedPeriod(period);
@@ -26,9 +26,15 @@ export default function App() {
       <Text style={styles.title}>{currentTab} Screen</Text>
       <TouchableOpacity
         style={styles.btn}
+        onPress={() => openAnalysisWithPeriod('Year')}
+      >
+        <Text style={styles.btnText}>Go to Analysis (Year)</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.secondaryBtn}
         onPress={() => openAnalysisWithPeriod('Monthly')}
       >
-        <Text style={styles.btnText}>Go to Analysis (Monthly)</Text>
+        <Text style={styles.secondaryBtnText}>Go to Analysis (Monthly)</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.secondaryBtn}
