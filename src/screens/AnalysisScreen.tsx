@@ -51,15 +51,15 @@ const CHART_DATA: Record<
     ],
   },
   Monthly: {
-    incomeTotal: '$48,900.00',
-    expenseTotal: '$14,670.00',
+    incomeTotal: '$47,200.00',
+    expenseTotal: '$35,510.20',
     bars: [
-      { label: 'Jan', income: 8.5, expense: 4.0 },
-      { label: 'Feb', income: 9.2, expense: 5.1 },
-      { label: 'Mar', income: 11.0, expense: 4.8 },
-      { label: 'Apr', income: 10.4, expense: 6.3 },
-      { label: 'May', income: 12.8, expense: 5.5 },
-      { label: 'Jun', income: 13.5, expense: 7.0 },
+      { label: 'Jan', income: 2.5, expense: 8.0 },
+      { label: 'Feb', income: 1.8, expense: 6.2 },
+      { label: 'Mar', income: 4.2, expense: 11.5 },
+      { label: 'Apr', income: 1.6, expense: 4.5 },
+      { label: 'May', income: 2.4, expense: 7.8 },
+      { label: 'Jun', income: 1.7, expense: 5.2 },
     ],
   },
   Year: {
@@ -86,7 +86,7 @@ export interface AnalysisScreenProps {
 export default function AnalysisScreen({
   navigation,
   route,
-  initialPeriod = 'Weekly',
+  initialPeriod = 'Monthly',
   onNavigateTab,
   onBack,
 }: AnalysisScreenProps) {

@@ -1,10 +1,10 @@
 ﻿import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import AnalysisScreen, { AppTabKey, PeriodKey } from './src/screens/AnalysisScreen';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<AppTabKey>('Analysis');
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodKey>('Weekly');
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodKey>('Monthly');
 
   const openAnalysisWithPeriod = (period: PeriodKey) => {
     setSelectedPeriod(period);
@@ -26,15 +26,15 @@ export default function App() {
       <Text style={styles.title}>{currentTab} Screen</Text>
       <TouchableOpacity
         style={styles.btn}
-        onPress={() => openAnalysisWithPeriod('Weekly')}
+        onPress={() => openAnalysisWithPeriod('Monthly')}
       >
-        <Text style={styles.btnText}>Go to Analysis (Weekly)</Text>
+        <Text style={styles.btnText}>Go to Analysis (Monthly)</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.secondaryBtn}
-        onPress={() => openAnalysisWithPeriod('Daily')}
+        onPress={() => openAnalysisWithPeriod('Weekly')}
       >
-        <Text style={styles.secondaryBtnText}>Go to Analysis (Daily)</Text>
+        <Text style={styles.secondaryBtnText}>Go to Analysis (Weekly)</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
