@@ -13,11 +13,6 @@ const SPENDS_ITEMS = [
   { id: "2", title: "Others", timeAndDate: "17:00 - April 24", tag: "Payments", amount: "$120,00", isPositive: true },
 ];
 
-const CATEGORIES_ITEMS = [
-  { id: "c1", title: "Pantry & Food", timeAndDate: "April 2023", tag: "Groceries", amount: "-$240,00", isPositive: false },
-  { id: "c2", title: "Bills & Payments", timeAndDate: "April 2023", tag: "Others", amount: "$120,00", isPositive: true },
-];
-
 export interface CalendarScreenProps {
   navigation?: any;
   onNavigateTab?: (tabName: AppTabKey | string) => void;
@@ -28,7 +23,7 @@ export default function CalendarScreen({ navigation, onNavigateTab, onBack }: Ca
   const [selectedMonth, setSelectedMonth] = useState("April");
   const [selectedYear, setSelectedYear] = useState("2023");
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
-  const [mode, setMode] = useState<CalendarMode>("Spends");
+  const [mode, setMode] = useState<CalendarMode>("Categories");
 
   const handleGoBack = () => {
     if (onBack) onBack();
@@ -52,8 +47,6 @@ export default function CalendarScreen({ navigation, onNavigateTab, onBack }: Ca
     setSelectedYear(list[(list.indexOf(selectedYear) + 1) % list.length]);
   };
 
-  const entries = mode === "Spends" ? SPENDS_ITEMS : CATEGORIES_ITEMS;
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#00D09E" />
@@ -64,13 +57,16 @@ export default function CalendarScreen({ navigation, onNavigateTab, onBack }: Ca
           <TouchableOpacity style={styles.bellBtn}><Ionicons name="notifications-outline" size={20} color="#093030" /></TouchableOpacity>
         </View>
       </View>
+
       <View style={styles.bodyContainer}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           <View style={styles.pickerRow}>
             <TouchableOpacity style={styles.pickerBtn} onPress={cycleMonth}><Text style={styles.pickerText}>{selectedMonth}</Text><Ionicons name="chevron-down" size={14} color="#00A878" /></TouchableOpacity>
             <TouchableOpacity style={styles.pickerBtn} onPress={cycleYear}><Text style={styles.pickerText}>{selectedYear}</Text><Ionicons name="chevron-down" size={14} color="#00A878" /></TouchableOpacity>
           </View>
+
           <View style={styles.weekHeaderRow}>{WEEK_DAYS.map((d) => (<Text key={d} style={styles.weekDayText}>{d}</Text>))}</View>
+
           <View style={styles.daysGrid}>
             {MONTH_DAYS.map((day) => {
               const isSelected = selectedDay === day;
@@ -81,6 +77,7 @@ export default function CalendarScreen({ navigation, onNavigateTab, onBack }: Ca
               );
             })}
           </View>
+
           <View style={styles.modeTabsRow}>
             {(["Spends", "Categories"] as CalendarMode[]).map((tab) => {
               const active = mode === tab;
@@ -91,19 +88,50 @@ export default function CalendarScreen({ navigation, onNavigateTab, onBack }: Ca
               );
             })}
           </View>
-          <View style={styles.itemsList}>
-            {entries.map((item, index) => (
-              <View key={item.id} style={styles.entryRow}>
-                <View style={styles.entryLeft}>
-                  <View style={styles.entryIconBox}><Ionicons name={index === 0 ? "cart" : "card"} size={20} color="#FFFFFF" /></View>
-                  <View><Text style={styles.entryTitle}>{item.title}</Text><Text style={styles.entrySub}>{item.timeAndDate}</Text></View>
+
+          {mode === "Categories" ? (
+            <View style={styles.chartSection}>
+              <View style={styles.semiChartWrap}>
+                <View style={styles.leftSlice}>
+                  <Text style={styles.slicePercentWhite}>10%</Text>
                 </View>
-                <View style={styles.entryMiddle}><Text style={styles.entryTag}>{item.tag}</Text></View>
-                <Text style={[styles.entryAmount, item.isPositive && styles.positiveAmount]}>{item.amount}</Text>
+                <View style={styles.rightStack}>
+                  <View style={styles.topRightSlice}>
+                    <Text style={styles.slicePercentWhite}>11%</Text>
+                  </View>
+                  <View style={styles.bottomRightSlice}>
+                    <Text style={styles.slicePercentDark}>79%</Text>
+                  </View>
+                </View>
               </View>
-            ))}
-          </View>
+
+              <View style={styles.legendRow}>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: "#0068FF" }]} />
+                  <Text style={styles.legendText}>Groceries</Text>
+                </View>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: "#388BFF" }]} />
+                  <Text style={styles.legendText}>Others</Text>
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.itemsList}>
+              {SPENDS_ITEMS.map((item, index) => (
+                <View key={item.id} style={styles.entryRow}>
+                  <View style={styles.entryLeft}>
+                    <View style={styles.entryIconBox}><Ionicons name={index === 0 ? "cart" : "card"} size={20} color="#FFFFFF" /></View>
+                    <View><Text style={styles.entryTitle}>{item.title}</Text><Text style={styles.entrySub}>{item.timeAndDate}</Text></View>
+                  </View>
+                  <View style={styles.entryMiddle}><Text style={styles.entryTag}>{item.tag}</Text></View>
+                  <Text style={[styles.entryAmount, item.isPositive && styles.positiveAmount]}>{item.amount}</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </ScrollView>
+
         <View style={styles.bottomNav}>
           <TouchableOpacity style={styles.navItem} onPress={() => handleBottomPress("Home")}><Ionicons name="home-outline" size={24} color="#093030" /></TouchableOpacity>
           <TouchableOpacity style={[styles.navItem, styles.navItemActive]} onPress={() => handleBottomPress("Analysis")}><Ionicons name="stats-chart-outline" size={22} color="#093030" /></TouchableOpacity>
@@ -140,6 +168,46 @@ const styles = StyleSheet.create({
   modeTabActive: { backgroundColor: "#00D09E" },
   modeTabText: { fontSize: 13, fontWeight: "600", color: "#093030" },
   modeTabTextActive: { color: "#093030", fontWeight: "700" },
+  chartSection: { alignItems: "center", marginTop: 4 },
+  semiChartWrap: {
+    width: 240,
+    height: 120,
+    borderTopLeftRadius: 120,
+    borderTopRightRadius: 120,
+    overflow: "hidden",
+    flexDirection: "row",
+  },
+  leftSlice: {
+    width: "36%",
+    height: "100%",
+    backgroundColor: "#0068FF",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 22,
+    borderRightWidth: 2,
+    borderRightColor: "#F6FFF8",
+  },
+  rightStack: { flex: 1, height: "100%" },
+  topRightSlice: {
+    flex: 0.34,
+    backgroundColor: "#4DA3FF",
+    justifyContent: "center",
+    alignItems: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "#F6FFF8",
+  },
+  bottomRightSlice: {
+    flex: 0.66,
+    backgroundColor: "#2F88FF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  slicePercentWhite: { fontSize: 12, fontWeight: "800", color: "#FFFFFF" },
+  slicePercentDark: { fontSize: 13, fontWeight: "800", color: "#093030" },
+  legendRow: { flexDirection: "row", gap: 28, marginTop: 14 },
+  legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendText: { fontSize: 12, fontWeight: "600", color: "#093030" },
   itemsList: { gap: 14 },
   entryRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 4 },
   entryLeft: { flexDirection: "row", alignItems: "center", gap: 10, flex: 1.4 },
