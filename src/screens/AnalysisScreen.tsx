@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import { Ionicons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 
-type PeriodKey = 'Daily' | 'Weekly' | 'Monthly' | 'Year';
+export type PeriodKey = 'Daily' | 'Weekly' | 'Monthly' | 'Year';
+export type AppTabKey = 'Home' | 'Analysis' | 'Transactions' | 'Categories' | 'Profile';
 
 interface ChartBarItem {
   label: string;
@@ -40,13 +41,13 @@ const CHART_DATA: Record<
     ],
   },
   Weekly: {
-    incomeTotal: '$12,450.00',
-    expenseTotal: '$4,320.10',
+    incomeTotal: '$11,420.00',
+    expenseTotal: '$20,000.20',
     bars: [
-      { label: 'W1', income: 9.0, expense: 5.0 },
-      { label: 'W2', income: 11.5, expense: 6.2 },
-      { label: 'W3', income: 7.4, expense: 4.1 },
-      { label: 'W4', income: 13.0, expense: 7.8 },
+      { label: '1st Week', income: 3.5, expense: 10.2 },
+      { label: '2nd Week', income: 1.5, expense: 4.2 },
+      { label: '3rd Week', income: 2.8, expense: 7.8 },
+      { label: '4th Week', income: 1.5, expense: 6.2 },
     ],
   },
   Monthly: {
@@ -74,24 +75,41 @@ const CHART_DATA: Record<
   },
 };
 
-interface AnalysisScreenProps {
+export interface AnalysisScreenProps {
   navigation?: any;
-  onNavigateTab?: (tabName: string) => void;
+  route?: { params?: { initialPeriod?: PeriodKey } };
+  initialPeriod?: PeriodKey;
+  onNavigateTab?: (tabName: AppTabKey | string) => void;
+  onBack?: () => void;
 }
 
 export default function AnalysisScreen({
   navigation,
+  route,
+  initialPeriod = 'Weekly',
   onNavigateTab,
+  onBack,
 }: AnalysisScreenProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodKey>('Daily');
+  const paramPeriod = route?.params?.initialPeriod || initialPeriod;
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodKey>(paramPeriod);
   const [activeBottomTab, setActiveBottomTab] = useState<string>('Analysis');
+
+  useEffect(() => {
+    if (route?.params?.initialPeriod) {
+      setSelectedPeriod(route.params.initialPeriod);
+    } else if (initialPeriod) {
+      setSelectedPeriod(initialPeriod);
+    }
+  }, [route?.params?.initialPeriod, initialPeriod]);
 
   const currentData = CHART_DATA[selectedPeriod];
   const maxChartValue = 15;
   const maxBarHeight = 96;
 
   const handleGoBack = () => {
-    if (navigation?.canGoBack && navigation.canGoBack()) {
+    if (onBack) {
+      onBack();
+    } else if (navigation?.canGoBack && navigation.canGoBack()) {
       navigation.goBack();
     } else if (navigation?.navigate) {
       navigation.navigate('Home');
@@ -100,11 +118,12 @@ export default function AnalysisScreen({
     }
   };
 
-  const handleBottomPress = (tab: string) => {
+  const handleBottomPress = (tab: AppTabKey) => {
     setActiveBottomTab(tab);
     if (navigation?.navigate) {
       navigation.navigate(tab);
-    } else if (onNavigateTab) {
+    }
+    if (onNavigateTab) {
       onNavigateTab(tab);
     }
   };
