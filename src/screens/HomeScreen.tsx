@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 type FilterPeriod = 'Daily' | 'Weekly' | 'Monthly';
 
@@ -64,8 +65,16 @@ const TRANSACTIONS_DATA: TransactionItem[] = [
   },
 ];
 
-export default function HomeScreen({ navigation }: { navigation: any }) {
+export default function HomeScreen({ navigation, onNavigate }: { navigation?: any; onNavigate?: (screen: string) => void }) {
   const [selectedPeriod, setSelectedPeriod] = useState<FilterPeriod>('Monthly');
+
+  const go = (screen: string) => {
+    if (navigation?.navigate) {
+      navigation.navigate(screen);
+    } else if (onNavigate) {
+      onNavigate(screen);
+    }
+  };
 
   const filteredTransactions = TRANSACTIONS_DATA.filter((item) => {
     if (selectedPeriod === 'Monthly') return true;
@@ -74,8 +83,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Жоғарғы бөлік (Приветствие және хабарлама белгісі -> Notification бетіне апарады) */}
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.greetingTitle}>Hi, Welcome Back</Text>
@@ -83,17 +91,16 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
           </View>
           <TouchableOpacity
             style={styles.notificationBtn}
-            onPress={() => navigation.navigate('Notification')}
+            onPress={() => go('Notification')}
           >
             <Text style={styles.notificationIcon}>🔔</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Қаржы карточкасы (Total Balance & Expense -> AccountBalance бетіне апарады) */}
         <TouchableOpacity
           style={styles.balanceCard}
           activeOpacity={0.85}
-          onPress={() => navigation.navigate('AccountBalance')}
+          onPress={() => go('AccountBalance')}
         >
           <View style={styles.balanceRow}>
             <View style={styles.balanceCol}>
@@ -107,7 +114,6 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
             </View>
           </View>
 
-          {/* Прогресс бар */}
           <View style={styles.progressContainer}>
             <View style={styles.progressBarBg}>
               <View style={styles.progressBarFill} />
@@ -118,13 +124,11 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
           <Text style={styles.tipText}>☑ 30% Of Your Expenses, Looks Good.</Text>
         </TouchableOpacity>
 
-        {/* Ақ түсті негізгі бөлік */}
         <View style={styles.mainContent}>
-          {/* Savings & Revenue карточкасы -> Analysis бетіне апарады */}
           <TouchableOpacity
             style={styles.statsCard}
             activeOpacity={0.85}
-            onPress={() => navigation.navigate('Analysis')}
+            onPress={() => go('Analysis')}
           >
             <View style={styles.savingsBox}>
               <View style={styles.circleProgress}>
@@ -153,7 +157,23 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
             </View>
           </TouchableOpacity>
 
-          {/* Күндік / Апталық / Айлық таңдау */}
+          <View style={styles.quickActionsRow}>
+            <TouchableOpacity style={styles.quickActionBtn} onPress={() => go('Analysis')}>
+              <Ionicons name="stats-chart-outline" size={16} color="#093030" />
+              <Text style={styles.quickActionText}>Analysis</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.quickActionBtn} onPress={() => go('Search')}>
+              <Ionicons name="search-outline" size={16} color="#093030" />
+              <Text style={styles.quickActionText}>Search</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.quickActionBtn} onPress={() => go('Calendar')}>
+              <Ionicons name="calendar-outline" size={16} color="#093030" />
+              <Text style={styles.quickActionText}>Calendar</Text>
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.filterRow}>
             {(['Daily', 'Weekly', 'Monthly'] as FilterPeriod[]).map((period) => {
               const isActive = selectedPeriod === period;
@@ -171,11 +191,20 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
             })}
           </View>
 
-          {/* Транзакциялар тізімі */}
-          <Text style={styles.sectionTitle}>Transactions</Text>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionTitle}>Transactions</Text>
+            <TouchableOpacity onPress={() => go('Transactions')}>
+              <Text style={styles.seeAllText}>See All</Text>
+            </TouchableOpacity>
+          </View>
 
           {filteredTransactions.map((item) => (
-            <View key={item.id} style={styles.transactionItem}>
+            <TouchableOpacity
+              key={item.id}
+              style={styles.transactionItem}
+              activeOpacity={0.8}
+              onPress={() => go('Transactions')}
+            >
               <View style={styles.transIconBlue}>
                 <Text style={styles.transEmoji}>{item.icon}</Text>
               </View>
@@ -191,10 +220,28 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                   {item.amount}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
+
+      <View style={styles.bottomNav}>
+        <TouchableOpacity style={[styles.navItem, styles.navItemActive]} onPress={() => go('Home')}>
+          <Ionicons name="home-outline" size={22} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => go('Analysis')}>
+          <Ionicons name="stats-chart-outline" size={20} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => go('Transactions')}>
+          <MaterialCommunityIcons name="swap-horizontal" size={24} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => go('Search')}>
+          <Ionicons name="layers-outline" size={22} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => go('AccountBalance')}>
+          <Ionicons name="person-outline" size={22} color="#093030" />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -203,6 +250,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#35C29B',
+  },
+  scrollContent: {
+    paddingBottom: 16,
   },
   headerRow: {
     flexDirection: 'row',
@@ -314,7 +364,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 15,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 14,
   },
   savingsBox: {
     alignItems: 'center',
@@ -373,6 +423,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#E53935',
   },
+  quickActionsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  quickActionBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    backgroundColor: '#E4F6EA',
+    paddingVertical: 9,
+    borderRadius: 16,
+  },
+  quickActionText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#093030',
+  },
   filterRow: {
     flexDirection: 'row',
     backgroundColor: '#E4F6EA',
@@ -397,11 +467,21 @@ const styles = StyleSheet.create({
   filterTextActive: {
     fontWeight: 'bold',
   },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#093030',
-    marginBottom: 15,
+  },
+  seeAllText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#00A878',
   },
   transactionItem: {
     flexDirection: 'row',
@@ -450,5 +530,25 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: 'bold',
     color: '#E53935',
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#DFF7E2',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  navItem: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navItemActive: {
+    backgroundColor: '#00D09E',
   },
 });

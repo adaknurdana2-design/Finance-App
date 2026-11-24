@@ -8,10 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+
+type TxFilterType = 'All' | 'Income' | 'Expense';
 
 interface TxRecord {
   id: string;
-  month: 'April' | 'March';
+  month: 'April' | 'March' | 'February';
   title: string;
   date: string;
   category: string;
@@ -74,6 +77,7 @@ function formatMoney(num: number): string {
 
 export default function TransactionScreen({ navigation }: { navigation: any }) {
   const [items, setItems] = useState<TxRecord[]>(INITIAL_TRANSACTIONS);
+  const [filterType, setFilterType] = useState<TxFilterType>('All');
   const [showAddForm, setShowAddForm] = useState(false);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('General');
@@ -89,6 +93,24 @@ export default function TransactionScreen({ navigation }: { navigation: any }) {
     .reduce((acc, i) => acc + Math.abs(i.amount), 0);
 
   const totalBalance = 7783 + (incomeTotal - 4000) - (expenseTotal - 778.53);
+
+  const filteredItems = items.filter((item) => {
+    if (filterType === 'Income') return item.amount > 0;
+    if (filterType === 'Expense') return item.amount < 0;
+    return true;
+  });
+
+  const handleToggleFilter = (target: 'Income' | 'Expense') => {
+    setFilterType((prev) => (prev === target ? 'All' : target));
+  };
+
+  const handleGoBack = () => {
+    if (navigation?.canGoBack && navigation.canGoBack()) {
+      navigation.goBack();
+    } else if (navigation?.navigate) {
+      navigation.navigate('Home');
+    }
+  };
 
   const handleAddTransaction = () => {
     const parsed = parseFloat(amountInput.replace(',', '.'));
@@ -113,19 +135,19 @@ export default function TransactionScreen({ navigation }: { navigation: any }) {
     setShowAddForm(false);
   };
 
-  const months: Array<'April' | 'March'> = ['April', 'March'];
+  const months: Array<'April' | 'March' | 'February'> = ['April', 'March', 'February'];
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <View style={styles.topBar}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
+            <TouchableOpacity onPress={handleGoBack} style={styles.iconBtn}>
               <Text style={styles.backArrow}>←</Text>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Transaction</Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Notification')}
+              onPress={() => navigation?.navigate?.('Notification')}
               style={styles.bellBtn}
             >
               <Text style={styles.bellIcon}>🔔</Text>
@@ -138,14 +160,57 @@ export default function TransactionScreen({ navigation }: { navigation: any }) {
           </View>
 
           <View style={styles.subStatsRow}>
-            <View style={styles.subStatCard}>
-              <Text style={styles.subStatLabel}>↙ Income</Text>
-              <Text style={styles.subStatIncome}>{formatMoney(incomeTotal)}</Text>
-            </View>
-            <View style={styles.subStatCard}>
-              <Text style={styles.subStatLabel}>↗ Expense</Text>
-              <Text style={styles.subStatExpense}>-{formatMoney(expenseTotal).replace('-', '')}</Text>
-            </View>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[
+                styles.subStatCard,
+                filterType === 'Income' && styles.subStatCardBlueActive,
+              ]}
+              onPress={() => handleToggleFilter('Income')}
+            >
+              <Text
+                style={[
+                  styles.subStatLabel,
+                  filterType === 'Income' && styles.subStatTextWhite,
+                ]}
+              >
+                ↙ Income
+              </Text>
+              <Text
+                style={[
+                  styles.subStatIncome,
+                  filterType === 'Income' && styles.subStatTextWhite,
+                ]}
+              >
+                {formatMoney(incomeTotal)}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[
+                styles.subStatCard,
+                filterType === 'Expense' && styles.subStatCardBlueActive,
+              ]}
+              onPress={() => handleToggleFilter('Expense')}
+            >
+              <Text
+                style={[
+                  styles.subStatLabel,
+                  filterType === 'Expense' && styles.subStatTextWhite,
+                ]}
+              >
+                ↗ Expense
+              </Text>
+              <Text
+                style={[
+                  styles.subStatExpense,
+                  filterType === 'Expense' && styles.subStatTextWhite,
+                ]}
+              >
+                -{formatMoney(expenseTotal).replace('-', '')}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -212,7 +277,7 @@ export default function TransactionScreen({ navigation }: { navigation: any }) {
           )}
 
           {months.map((monthName) => {
-            const monthItems = items.filter((item) => item.month === monthName);
+            const monthItems = filteredItems.filter((item) => item.month === monthName);
             if (monthItems.length === 0) return null;
 
             return (
@@ -247,12 +312,37 @@ export default function TransactionScreen({ navigation }: { navigation: any }) {
           })}
         </View>
       </ScrollView>
+
+      <View style={styles.bottomNav}>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation?.navigate?.('Home')}>
+          <Ionicons name="home-outline" size={22} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation?.navigate?.('Analysis')}>
+          <Ionicons name="stats-chart-outline" size={20} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.navItem, styles.navItemActive]}
+          onPress={() => navigation?.navigate?.('Transactions')}
+        >
+          <MaterialCommunityIcons name="swap-horizontal" size={24} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation?.navigate?.('Search')}>
+          <Ionicons name="layers-outline" size={22} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation?.navigate?.('AccountBalance')}
+        >
+          <Ionicons name="person-outline" size={22} color="#093030" />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F3FFF6' },
+  scrollContent: { paddingBottom: 16 },
   header: {
     backgroundColor: '#00C48C',
     paddingHorizontal: 20,
@@ -296,10 +386,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  subStatLabel: { fontSize: 12, color: '#093030' },
+  subStatCardBlueActive: {
+    backgroundColor: '#0068FF',
+  },
+  subStatLabel: { fontSize: 12, color: '#093030', fontWeight: '600' },
   subStatIncome: { fontSize: 16, fontWeight: '800', color: '#093030', marginTop: 2 },
   subStatExpense: { fontSize: 16, fontWeight: '800', color: '#0068FF', marginTop: 2 },
-  content: { padding: 20, paddingBottom: 32 },
+  subStatTextWhite: { color: '#FFFFFF' },
+  content: { padding: 20, paddingBottom: 24 },
   actionRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -374,4 +468,16 @@ const styles = StyleSheet.create({
   txAmount: { fontSize: 14, fontWeight: '700' },
   txPositive: { color: '#093030' },
   txNegative: { color: '#0068FF' },
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#DFF7E2',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  navItem: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
+  navItemActive: { backgroundColor: '#00D09E' },
 });

@@ -106,6 +106,14 @@ export default function AnalysisScreen({
   const maxChartValue = 15;
   const maxBarHeight = 96;
 
+  const navigateToScreen = (screenName: string) => {
+    if (navigation?.navigate) {
+      navigation.navigate(screenName);
+    } else if (onNavigateTab) {
+      onNavigateTab(screenName);
+    }
+  };
+
   const handleGoBack = () => {
     if (onBack) {
       onBack();
@@ -130,14 +138,17 @@ export default function AnalysisScreen({
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#00D09E" />
+      <StatusBar barStyle="dark-content" />
       <View style={styles.headerSection}>
         <View style={styles.topBar}>
           <TouchableOpacity onPress={handleGoBack} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Analysis</Text>
-          <TouchableOpacity style={styles.bellBtn}>
+          <TouchableOpacity
+            style={styles.bellBtn}
+            onPress={() => navigateToScreen('Notification')}
+          >
             <Ionicons name="notifications-outline" size={20} color="#093030" />
           </TouchableOpacity>
         </View>
@@ -191,10 +202,16 @@ export default function AnalysisScreen({
             <View style={styles.chartHeader}>
               <Text style={styles.chartTitle}>Income & Expenses</Text>
               <View style={styles.chartActionIcons}>
-                <TouchableOpacity style={styles.circleActionBtn}>
+                <TouchableOpacity
+                  style={styles.circleActionBtn}
+                  onPress={() => navigateToScreen('Search')}
+                >
                   <Ionicons name="search-outline" size={16} color="#093030" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.circleActionBtn}>
+                <TouchableOpacity
+                  style={styles.circleActionBtn}
+                  onPress={() => navigateToScreen('Calendar')}
+                >
                   <Ionicons name="calendar-outline" size={16} color="#093030" />
                 </TouchableOpacity>
               </View>
@@ -246,6 +263,22 @@ export default function AnalysisScreen({
             </View>
           </View>
           <Text style={styles.targetsTitle}>My Targets</Text>
+          <View style={styles.targetsRow}>
+            <View style={styles.targetCard}>
+              <View style={styles.targetRing}>
+                <View style={styles.targetRingArcTravel} />
+                <Text style={styles.targetPercent}>30%</Text>
+              </View>
+              <Text style={styles.targetLabel}>Travel</Text>
+            </View>
+            <View style={styles.targetCard}>
+              <View style={styles.targetRing}>
+                <View style={styles.targetRingArcCar} />
+                <Text style={styles.targetPercent}>50%</Text>
+              </View>
+              <Text style={styles.targetLabel}>Car</Text>
+            </View>
+          </View>
         </ScrollView>
         <View style={styles.bottomNav}>
           <TouchableOpacity style={styles.navItem} onPress={() => handleBottomPress('Home')}>
@@ -293,7 +326,7 @@ const styles = StyleSheet.create({
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingLeft: 4 },
   statusText: { fontSize: 12, color: '#093030', fontWeight: '500' },
   bodyContainer: { flex: 1, backgroundColor: '#F6FFF8', borderTopLeftRadius: 36, borderTopRightRadius: 36, overflow: 'hidden' },
-  scrollContent: { paddingHorizontal: 22, paddingTop: 22, paddingBottom: 20 },
+  scrollContent: { paddingHorizontal: 22, paddingTop: 22, paddingBottom: 24 },
   periodTabsWrapper: { flexDirection: 'row', backgroundColor: '#DFF7E2', borderRadius: 20, padding: 4, justifyContent: 'space-between', marginBottom: 18 },
   periodTab: { flex: 1, paddingVertical: 10, borderRadius: 16, alignItems: 'center' },
   periodTabActive: { backgroundColor: '#00D09E' },
@@ -323,7 +356,14 @@ const styles = StyleSheet.create({
   summaryLabel: { fontSize: 13, color: '#093030', fontWeight: '500', marginBottom: 2 },
   summaryIncomeVal: { fontSize: 18, fontWeight: '800', color: '#093030' },
   summaryExpenseVal: { fontSize: 18, fontWeight: '800', color: '#0068FF' },
-  targetsTitle: { fontSize: 15, fontWeight: '700', color: '#093030', marginTop: 4 },
+  targetsTitle: { fontSize: 15, fontWeight: '700', color: '#093030', marginTop: 4, marginBottom: 12 },
+  targetsRow: { flexDirection: 'row', gap: 14 },
+  targetCard: { flex: 1, backgroundColor: '#76A9FA', borderRadius: 24, paddingVertical: 16, alignItems: 'center', justifyContent: 'center' },
+  targetRing: { width: 78, height: 78, borderRadius: 39, borderWidth: 6, borderColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', marginBottom: 8, position: 'relative' },
+  targetRingArcTravel: { position: 'absolute', top: -6, right: -6, width: 39, height: 39, borderTopRightRadius: 39, borderTopWidth: 6, borderRightWidth: 6, borderColor: '#1D4ED8' },
+  targetRingArcCar: { position: 'absolute', top: -6, right: -6, bottom: -6, width: 39, borderTopRightRadius: 39, borderBottomRightRadius: 39, borderTopWidth: 6, borderRightWidth: 6, borderBottomWidth: 6, borderColor: '#1D4ED8' },
+  targetPercent: { fontSize: 14, fontWeight: '800', color: '#FFFFFF' },
+  targetLabel: { fontSize: 13, fontWeight: '600', color: '#FFFFFF' },
   bottomNav: { flexDirection: 'row', backgroundColor: '#DFF7E2', borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingVertical: 12, paddingHorizontal: 18, justifyContent: 'space-around', alignItems: 'center' },
   navItem: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   navItemActive: { backgroundColor: '#00D09E' },

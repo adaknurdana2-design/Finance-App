@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   StyleSheet,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const TRANSACTIONS = [
   { id: '1', title: 'Salary', date: '18:27 - April 30', category: 'Monthly', amount: '$4.000,00', isIncome: true, icon: '💼' },
@@ -16,20 +17,28 @@ const TRANSACTIONS = [
 ];
 
 export default function AccountBalanceScreen({ navigation }: { navigation: any }) {
+  const goBackSafe = () => {
+    if (navigation?.canGoBack && navigation.canGoBack()) {
+      navigation.goBack();
+    } else if (navigation?.navigate) {
+      navigation.navigate('Home');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollBody}>
         <View style={styles.header}>
           <View style={styles.topRow}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
-              <Text style={styles.backArrow}>←</Text>
+            <TouchableOpacity onPress={goBackSafe} style={styles.iconBtn}>
+              <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Account Balance</Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Notification')}
+              onPress={() => navigation?.navigate?.('Notification')}
               style={styles.bellBtn}
             >
-              <Text style={styles.bellIcon}>🔔</Text>
+              <Ionicons name="notifications-outline" size={20} color="#093030" />
             </TouchableOpacity>
           </View>
 
@@ -46,7 +55,9 @@ export default function AccountBalanceScreen({ navigation }: { navigation: any }
           </View>
 
           <View style={styles.progressBar}>
-            <View style={styles.progressFill} />
+            <View style={styles.progressFill}>
+              <Text style={styles.progressPercent}>30%</Text>
+            </View>
             <Text style={styles.progressText}>$20,000.00</Text>
           </View>
 
@@ -69,13 +80,18 @@ export default function AccountBalanceScreen({ navigation }: { navigation: any }
         <View style={styles.content}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Transactions</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation?.navigate?.('Transactions')}>
               <Text style={styles.seeAllText}>See all</Text>
             </TouchableOpacity>
           </View>
 
           {TRANSACTIONS.map((item) => (
-            <View key={item.id} style={styles.transactionRow}>
+            <TouchableOpacity
+              key={item.id}
+              style={styles.transactionRow}
+              activeOpacity={0.8}
+              onPress={() => navigation?.navigate?.('Transactions')}
+            >
               <View style={styles.txIconCircle}>
                 <Text style={styles.txEmoji}>{item.icon}</Text>
               </View>
@@ -87,23 +103,42 @@ export default function AccountBalanceScreen({ navigation }: { navigation: any }
               <Text style={[styles.txAmount, item.isIncome && styles.txAmountIncome]}>
                 {item.amount}
               </Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
+
+      <View style={styles.bottomNav}>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation?.navigate?.('Home')}>
+          <Ionicons name="home-outline" size={22} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation?.navigate?.('Analysis')}>
+          <Ionicons name="stats-chart-outline" size={20} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation?.navigate?.('Transactions')}>
+          <MaterialCommunityIcons name="swap-horizontal" size={24} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation?.navigate?.('Search')}>
+          <Ionicons name="layers-outline" size={22} color="#093030" />
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.navItem, styles.navItemActive]} onPress={() => navigation?.navigate?.('AccountBalance')}>
+          <Ionicons name="person-outline" size={22} color="#093030" />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#EAFBF4' },
+  container: { flex: 1, backgroundColor: '#00C48C' },
+  scrollBody: { backgroundColor: '#F6FFF8', flexGrow: 1 },
   header: {
     backgroundColor: '#00C48C',
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 24,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
   },
   topRow: {
     flexDirection: 'row',
@@ -112,7 +147,6 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   iconBtn: { padding: 4 },
-  backArrow: { fontSize: 22, color: '#FFFFFF', fontWeight: '700' },
   headerTitle: { fontSize: 20, fontWeight: '700', color: '#093030' },
   bellBtn: {
     width: 34,
@@ -122,7 +156,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bellIcon: { fontSize: 15 },
   balanceRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -151,6 +184,13 @@ const styles = StyleSheet.create({
     width: '30%',
     backgroundColor: '#FFFFFF',
     borderRadius: 11,
+    justifyContent: 'center',
+    paddingLeft: 8,
+  },
+  progressPercent: {
+    color: '#093030',
+    fontSize: 10,
+    fontWeight: '700',
   },
   progressText: {
     alignSelf: 'flex-end',
@@ -172,7 +212,7 @@ const styles = StyleSheet.create({
   cardValueBlack: { fontSize: 17, fontWeight: '800', color: '#093030', marginTop: 2 },
   cardValueBlue: { fontSize: 17, fontWeight: '800', color: '#0068FF', marginTop: 2 },
   hintText: { fontSize: 12, color: '#093030', fontWeight: '500' },
-  content: { padding: 20 },
+  content: { padding: 20, backgroundColor: '#F6FFF8' },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -202,4 +242,16 @@ const styles = StyleSheet.create({
   txCategory: { fontSize: 12, color: '#334155', marginRight: 12 },
   txAmount: { fontSize: 14, fontWeight: '700', color: '#0068FF' },
   txAmountIncome: { color: '#093030' },
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#DFF7E2',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  navItem: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
+  navItemActive: { backgroundColor: '#00D09E' },
 });
